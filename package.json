@@ -1,0 +1,20 @@
+{
+  "name": "test-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "bootstrap-switch": "^3.3.4",
+    "express": "^4.16.3",
+    "npm": "^5.7.1",
+    "request": "^2.85.0"
+  }
+}

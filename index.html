@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+
+<head>
+    <title>Google Play App Rank</title>
+    <!--Jquery -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <!--Boostrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!--Font Awsome -->
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css'>
+</head>
+
+<body>
+    <div class="continer" style="margin: 50px;">
+        <div class="jumbotron">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">package-name</span>
+                </div>
+                <input id="pid" type="text" class="valide form-control" placeholder="com.whatsapp" aria-label="packagename" aria-describedby="basic-addon1" style="margin-right: 20px;">
+                <button id="send_request_button" type="button" class="btn btn-primary btn-lg" style="margin-right: 20px;">Get Rank</button>
+                <div style="width: 100px;">
+                    <select id="price-select" class="custom-select">
+                        <option value="free" selected>Free</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <table id="example" class="display" width="100%"></table>
+    </div>
+</body>
+<script type="text/javascript">
+$("#send_request_button").on('click', function() {
+    var button = $(this);
+    var package_name = $('#pid').val();
+    var price = $('#price-select').val();
+
+    console.log(price)
+
+    if (package_name) {
+        var loadingText = '<i class="fa fa-circle-o-notch fa-spin"></i> loading...';
+        if ($(this).html() !== loadingText) {
+            button.data('original-text', $(this).html());
+            button.html(loadingText);
+        }
+
+        sendRequest(button, package_name, price)
+    } else {
+        $('.validate').attr('style', "border-radius: 5px; border:#FF0000 1px solid;");
+    }
+});
+
+function sendRequest(button, pid, price) {
+    var send_data = {
+        'package_name': pid,
+        'price': price
+    }
+    $.ajax({
+        type: "POST",
+        url: 'http://localhost:8080/data',
+        data: send_data,
+        success: function(data) {
+            button.html(button.data('original-text'));
+            if (data != 'eror') {
+                parseData(data)
+            }
+        },
+        error: function() {
+            console.log("error Ajax");
+        },
+        complete: function(jqXHR, textStatus) {
+            console.log(`AJAX thinks login request was a ${textStatus}`);
+        }
+    });
+}
+
+
+function parseData(response_data) {
+    var dataSet = [];
+
+    for (var i = 0; i < response_data.length; i++) {
+        var one = response_data[i]
+        var one_array = []
+        one_array.push(one.country_code)
+        one_array.push(one.country_name)
+        one_array.push(one.rank)
+        dataSet.push(one_array)
+    }
+
+    $('#example').DataTable({
+        destroy: true,
+        data: dataSet,
+        columns: [
+            { title: "Country Code" },
+            { title: "Country" },
+            { title: "Rank" }
+        ]
+    });
+}
+</script>
+
+</html>
