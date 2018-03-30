@@ -26,7 +26,7 @@ var makeCall = function(country, link) {
 
         var data = {
             'start': "0",
-            'num': "100",
+            'num': "120",
             'numChildren': 0,
             'cctcss': 'square-cover',
             'cllayout': 'NORMAL',
@@ -67,7 +67,7 @@ var parseBody = function(body, country) {
     var response = {
         'country_code': country.code,
         'country_name': country.name,
-        'rank': 'not in 100'
+        'rank': 'not in 120'
     };
     while ((m = regex_list.exec(body)) !== null) {
         // This is necessary to avoid infinite loops with zero-width matches
