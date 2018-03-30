@@ -3,7 +3,8 @@ var Promise = require("bluebird");
 var countries = require("./countries.js");
 
 const regex_list = /class="card no-rationale square-cover apps small" data-docid="(.*?)"/g;
-const regex_category = '<a class="document-subtitle category" href="[\/]store[\/]apps[\/]category[\/](.*?)">';
+//const regex_category = '<a class="document-subtitle category" href="[\/]store[\/]apps[\/]category[\/](.*?)">';
+const regex_category = '<a itemprop="genre" href="https:[\/][\/]play.google.com[\/]store[\/]apps[\/]category[\/](.*?)"'
 
 
 var pid = ''
@@ -26,11 +27,11 @@ var makeCall = function(country, link) {
         var data = {
             'start': "0",
             'num': "100",
-            //'numChildren': 0,
-            //'cctcss': 'square-cover',
-            //'cllayout': 'NORMAL',
-            //'ipf': '1',
-            //'xhr': '1'
+            'numChildren': 0,
+            'cctcss': 'square-cover',
+            'cllayout': 'NORMAL',
+            'ipf': '1',
+            'xhr': '1'
         }
 
         // Set the headers
@@ -107,13 +108,20 @@ var getAllCountries = function(res) {
 
 
 var getCategory = function(link, res) {
+
+    // var headers = {
+    //     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+    //     'Content-Type': 'application/x-www-form-urlencoded'
+    // }
     var options = {
         url: link,
-        method: 'POST',
+        method: 'GET',
+        //headers: headers,
     }
 
     request(options, function(error, response, body) {
         if (!error && response.statusCode == 200) {
+            console.log(response)
             var matches = body.match(regex_category);
             category = matches[1].toUpperCase();
             console.log(category);
@@ -121,6 +129,8 @@ var getCategory = function(link, res) {
         } else {
             res.send('error');
             console.log(error);
+            console.log(response);
+            console.log(body);
         }
     })
 }
