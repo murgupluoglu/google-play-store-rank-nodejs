@@ -36,7 +36,7 @@ var makeCall = function(country, link) {
 
         // Set the headers
         var headers = {
-            'User-Agent': 'Super Agent/0.0.1',
+            'User-Agent': 'Chrome/59.0.3071.115',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
 
@@ -88,21 +88,43 @@ var parseBody = function(body, country) {
 
 }
 
-var getAllCountries = function(res) {
-    all_array = [];
+var count = 0;
+all_array = [];
 
-    Promise.map(countries.getAll(), function(country) {
-            return makeCall(country, getStoreListingURL() + '?gl=' + country.code);
-        })
-        .each(function(result) {
-            all_array.push(result);
-        })
-        .then(function(results) {
-            res.send(results);
-            console.log(results);
+var getAllCountries = function(res) {
+
+    // Promise.map(countries.getAll(), function(country) {
+    //         //console.log(getStoreListingURL() + '?gl=' + country.code);
+    //         return makeCall(country, getStoreListingURL() + '?gl=' + country.code);
+    //     })
+    //     .each(function(result) {
+    //     	console.log(result)
+    //         all_array.push(result);
+    //     })
+    //     .then(function(results) {
+    //     	console.log(results);
+    //         res.send(results);
+    //     }).catch(error => {
+    //     	console.log(error);
+    //         res.send('error');
+    //     });
+
+
+    var country = countries.getAll()[count]
+    console.log(country)
+    makeCall(country, getStoreListingURL() + '?gl=' + country.code)
+        .then(function(result) {
+            console.log(result);
+            all_array.push(result)
+            if (count < countries.getAll().length - 1) {
+                count++
+                getAllCountries(res)
+            } else {
+                res.send(all_array)
+            }
         }).catch(error => {
-            res.send('error');
             console.log(error);
+            res.send('error');
         });
 }
 
@@ -121,7 +143,7 @@ var getCategory = function(link, res) {
 
     request(options, function(error, response, body) {
         if (!error && response.statusCode == 200) {
-            console.log(response)
+            //console.log(response)
             var matches = body.match(regex_category);
             category = matches[1].toUpperCase();
             console.log(category);
@@ -135,7 +157,12 @@ var getCategory = function(link, res) {
     })
 }
 
+// pid = 'com.whatsapp'
+// price = 'free'
 
+// console.log(pid)
+// console.log(price)
+// getCategory(getStoreDetailURL(), null)
 
 
 
@@ -159,7 +186,8 @@ app.post('/data', function(req, res) {
 });
 
 
-app.listen(8080, () => console.log('app listening on port 8080!'))
+var server = app.listen(8080, () => console.log('app listening on port 8080!'))
+server.timeout = 0;
 /*
 Express
 */

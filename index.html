@@ -77,7 +77,8 @@ function sendRequest(button, pid, price) {
         },
         complete: function(jqXHR, textStatus) {
             console.log(`AJAX thinks login request was a ${textStatus}`);
-        }
+        },
+        timeout: 3000 * 1000
     });
 }
 
