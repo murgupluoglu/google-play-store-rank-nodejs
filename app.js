@@ -1,4 +1,5 @@
-var request = require("request");
+//var request = require("request");
+const requestpromise = require('request-promise');
 var Promise = require("bluebird");
 var countries = require("./countries.js");
 
@@ -20,44 +21,44 @@ var getStoreListingURL = function() {
 }
 
 
-var makeCall = function(country, link) {
+// var makeCall = function(country, link) {
 
-    return new Promise(function(resolve, reject) {
+//     return new Promise(function(resolve, reject) {
 
-        var data = {
-            'start': "0",
-            'num': "120",
-            'numChildren': 0,
-            'cctcss': 'square-cover',
-            'cllayout': 'NORMAL',
-            'ipf': '1',
-            'xhr': '1'
-        }
+//         var data = {
+//             'start': "0",
+//             'num': "120",
+//             'numChildren': 0,
+//             'cctcss': 'square-cover',
+//             'cllayout': 'NORMAL',
+//             'ipf': '1',
+//             'xhr': '1'
+//         }
 
-        // Set the headers
-        var headers = {
-            'User-Agent': 'Chrome/59.0.3071.115',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
+//         // Set the headers
+//         var headers = {
+//             'User-Agent': 'Chrome/59.0.3071.115',
+//             'Content-Type': 'application/x-www-form-urlencoded'
+//         }
 
-        var options = {
-            url: link,
-            method: 'POST',
-            headers: headers,
-            form: data
-        }
+//         var options = {
+//             url: link,
+//             method: 'POST',
+//             headers: headers,
+//             form: data
+//         }
 
-        request(options, function(error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var response = parseBody(body, country);
-                resolve(response);
-            } else {
-                reject(error);
-            }
-        })
+//         request(options, function(error, response, body) {
+//             if (!error && response.statusCode == 200) {
+//                 var response = parseBody(body, country);
+//                 resolve(response);
+//             } else {
+//                 reject(error);
+//             }
+//         })
 
-    })
-}
+//     })
+// }
 
 
 var parseBody = function(body, country) {
@@ -88,44 +89,84 @@ var parseBody = function(body, country) {
 
 }
 
-var count = 0;
-all_array = [];
+
 
 var getAllCountries = function(res) {
+
+    var count = 0;
+    var all_array = [];
+
+    const promises = countries.getAll().map(country => {
+        var data = {
+            'start': "0",
+            'num': "120",
+            'numChildren': 0,
+            'cctcss': 'square-cover',
+            'cllayout': 'NORMAL',
+            'ipf': '1',
+            'xhr': '1'
+        }
+
+        // Set the headers
+        var headers = {
+            'User-Agent': 'Chrome/59.0.3071.115',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
+        var options = {
+            url: getStoreListingURL() + '?gl=' + country.code,
+            method: 'POST',
+            headers: headers,
+            form: data
+        }
+        return requestpromise(options);
+    });
+    Promise
+        .all(promises)
+        .each(function(one) {
+            var parsed = parseBody(one, countries.getAll()[count]);
+            all_array.push(parsed);
+            count++
+        }).then((data) => {
+            console.log(all_array)
+            res.send(all_array);
+        });
+
+
 
     // Promise.map(countries.getAll(), function(country) {
     //         //console.log(getStoreListingURL() + '?gl=' + country.code);
     //         return makeCall(country, getStoreListingURL() + '?gl=' + country.code);
     //     })
     //     .each(function(result) {
-    //     	console.log(result)
+    //      console.log(result)
     //         all_array.push(result);
     //     })
     //     .then(function(results) {
-    //     	console.log(results);
+    //      console.log(results);
     //         res.send(results);
     //     }).catch(error => {
-    //     	console.log(error);
+    //      console.log(error);
     //         res.send('error');
     //     });
 
 
-    var country = countries.getAll()[count]
-    console.log(country)
-    makeCall(country, getStoreListingURL() + '?gl=' + country.code)
-        .then(function(result) {
-            console.log(result);
-            all_array.push(result)
-            if (count < countries.getAll().length - 1) {
-                count++
-                getAllCountries(res)
-            } else {
-                res.send(all_array)
-            }
-        }).catch(error => {
-            console.log(error);
-            res.send('error');
-        });
+    // var country = countries.getAll()[count]
+    // console.log(country)
+    // makeCall(country, getStoreListingURL() + '?gl=' + country.code)
+    //     .then(function(result) {
+    //         console.log(result);
+    //         all_array.push(result)
+    //         if (count < countries.getAll().length - 1) {
+    //             count++
+    //             getAllCountries(res)
+    //         } else {
+    //             res.send(all_array)
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //         res.send('error');
+    //     });
 }
 
 
@@ -141,20 +182,25 @@ var getCategory = function(link, res) {
         //headers: headers,
     }
 
-    request(options, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-            //console.log(response)
+    requestpromise(options).then(function(body) {
             var matches = body.match(regex_category);
             category = matches[1].toUpperCase();
             console.log(category);
             getAllCountries(res);
-        } else {
+        })
+        .catch(function(err) {
             res.send('error');
-            console.log(error);
-            console.log(response);
-            console.log(body);
-        }
-    })
+            console.log(err);
+        });
+
+    // request(options, function(error, response, body) {
+    //     if (!error && response.statusCode == 200) {
+    //         //console.log(response)
+
+    //     } else {
+
+    //     }
+    // })
 }
 
 // pid = 'com.whatsapp'
