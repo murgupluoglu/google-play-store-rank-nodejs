@@ -91,7 +91,12 @@ function parseData(response_data) {
         var one_array = []
         one_array.push(one.country_code)
         one_array.push(one.country_name)
-        one_array.push(one.rank)
+        if (isNaN(parseInt(one.rank))) {
+            one_array.push(121)
+        } else {
+            one_array.push(parseInt(one.rank))
+        }
+
         dataSet.push(one_array)
     }
 
@@ -102,6 +107,9 @@ function parseData(response_data) {
             { title: "Country Code" },
             { title: "Country" },
             { title: "Rank" }
+        ],
+        order: [
+            [2, 'asc']
         ]
     });
 }
