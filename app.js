@@ -119,6 +119,7 @@ var getAllCountries = function(res) {
             headers: headers,
             form: data
         }
+        //console.log(getStoreListingURL() + '?gl=' + country.code);
         return requestpromise(options);
     });
     Promise
