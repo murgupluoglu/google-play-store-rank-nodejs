@@ -1,7 +1,8 @@
 //var request = require("request");
 const requestpromise = require('request-promise');
-var Promise = require("bluebird");
-var countries = require("./countries.js");
+const Promise = require("bluebird");
+const countries = require("./countries.js");
+const request = require('sync-request');
 
 const regex_list = /class="card no-rationale square-cover apps small" data-docid="(.*?)"/g;
 //const regex_category = '<a class="document-subtitle category" href="[\/]store[\/]apps[\/]category[\/](.*?)">';
@@ -89,8 +90,49 @@ var parseBody = function(body, country) {
 
 }
 
+var getAllCountries = function(res) { //for Slow Connections
+
+    var count = 0;
+    var all_array = [];
+
+    countries.getAll().map(country => {
+        var data = {
+            'start': "0",
+            'num': "120",
+            'numChildren': 0,
+            'cctcss': 'square-cover',
+            'cllayout': 'NORMAL',
+            'ipf': '1',
+            'xhr': '1'
+        }
+
+        // Set the headers
+        var headers = {
+            'User-Agent': 'Chrome/59.0.3071.115',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
+        var options = {
+            //url: getStoreListingURL() + '?gl=' + country.code,
+            method: 'POST',
+            headers: headers,
+            form: data
+        }
+        //console.log(getStoreListingURL() + '?gl=' + country.code);
+        //return requestpromise(options);
+        var res = request('POST', getStoreListingURL() + '?gl=' + country.code, options);
+        var one = res.getBody('utf8')
+        var parsed = parseBody(one, country);
+        console.log(parsed);
+        all_array.push(parsed);
+    });
+
+	console.log('***************************************')
+    res.send(all_array);
+}
 
 
+/*
 var getAllCountries = function(res) {
 
     var count = 0;
@@ -132,43 +174,8 @@ var getAllCountries = function(res) {
             console.log(all_array)
             res.send(all_array);
         });
-
-
-
-    // Promise.map(countries.getAll(), function(country) {
-    //         //console.log(getStoreListingURL() + '?gl=' + country.code);
-    //         return makeCall(country, getStoreListingURL() + '?gl=' + country.code);
-    //     })
-    //     .each(function(result) {
-    //      console.log(result)
-    //         all_array.push(result);
-    //     })
-    //     .then(function(results) {
-    //      console.log(results);
-    //         res.send(results);
-    //     }).catch(error => {
-    //      console.log(error);
-    //         res.send('error');
-    //     });
-
-
-    // var country = countries.getAll()[count]
-    // console.log(country)
-    // makeCall(country, getStoreListingURL() + '?gl=' + country.code)
-    //     .then(function(result) {
-    //         console.log(result);
-    //         all_array.push(result)
-    //         if (count < countries.getAll().length - 1) {
-    //             count++
-    //             getAllCountries(res)
-    //         } else {
-    //             res.send(all_array)
-    //         }
-    //     }).catch(error => {
-    //         console.log(error);
-    //         res.send('error');
-    //     });
 }
+*/
 
 
 var getCategory = function(link, res) {
