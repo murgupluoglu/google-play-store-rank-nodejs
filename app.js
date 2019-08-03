@@ -22,46 +22,6 @@ var getStoreListingURL = function() {
 }
 
 
-// var makeCall = function(country, link) {
-
-//     return new Promise(function(resolve, reject) {
-
-//         var data = {
-//             'start': "0",
-//             'num': "120",
-//             'numChildren': 0,
-//             'cctcss': 'square-cover',
-//             'cllayout': 'NORMAL',
-//             'ipf': '1',
-//             'xhr': '1'
-//         }
-
-//         // Set the headers
-//         var headers = {
-//             'User-Agent': 'Chrome/59.0.3071.115',
-//             'Content-Type': 'application/x-www-form-urlencoded'
-//         }
-
-//         var options = {
-//             url: link,
-//             method: 'POST',
-//             headers: headers,
-//             form: data
-//         }
-
-//         request(options, function(error, response, body) {
-//             if (!error && response.statusCode == 200) {
-//                 var response = parseBody(body, country);
-//                 resolve(response);
-//             } else {
-//                 reject(error);
-//             }
-//         })
-
-//     })
-// }
-
-
 var parseBody = function(body, country) {
 
     let m;
@@ -69,8 +29,9 @@ var parseBody = function(body, country) {
     var response = {
         'country_code': country.code,
         'country_name': country.name,
-        'rank': 'not in 120'
+        'rank': 'not in 60'
     };
+
     while ((m = regex_list.exec(body)) !== null) {
         // This is necessary to avoid infinite loops with zero-width matches
         if (m.index === regex_list.lastIndex) {
@@ -98,7 +59,7 @@ var getAllCountries = function(res) { //for Slow Connections
     countries.getAll().map(country => {
         var data = {
             'start': "0",
-            'num': "120",
+            'num': "60",
             'numChildren': 0,
             'cctcss': 'square-cover',
             'cllayout': 'NORMAL',
@@ -127,97 +88,9 @@ var getAllCountries = function(res) { //for Slow Connections
         all_array.push(parsed);
     });
 
-	console.log('***************************************')
+	console.log('*****************DONE**********************')
     res.send(all_array);
 }
-
-
-/*
-var getAllCountries = function(res) {
-
-    var count = 0;
-    var all_array = [];
-
-    const promises = countries.getAll().map(country => {
-        var data = {
-            'start': "0",
-            'num': "120",
-            'numChildren': 0,
-            'cctcss': 'square-cover',
-            'cllayout': 'NORMAL',
-            'ipf': '1',
-            'xhr': '1'
-        }
-
-        // Set the headers
-        var headers = {
-            'User-Agent': 'Chrome/59.0.3071.115',
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-
-        var options = {
-            url: getStoreListingURL() + '?gl=' + country.code,
-            method: 'POST',
-            headers: headers,
-            form: data
-        }
-        //console.log(getStoreListingURL() + '?gl=' + country.code);
-        return requestpromise(options);
-    });
-    Promise
-        .all(promises)
-        .each(function(one) {
-            var parsed = parseBody(one, countries.getAll()[count]);
-            all_array.push(parsed);
-            count++
-        }).then((data) => {
-            console.log(all_array)
-            res.send(all_array);
-        });
-}
-*/
-
-
-var getCategory = function(link, res) {
-
-    // var headers = {
-    //     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
-    //     'Content-Type': 'application/x-www-form-urlencoded'
-    // }
-    var options = {
-        url: link,
-        method: 'GET',
-        //headers: headers,
-    }
-
-    requestpromise(options).then(function(body) {
-            var matches = body.match(regex_category);
-            category = matches[1].toUpperCase();
-            console.log(category);
-            getAllCountries(res);
-        })
-        .catch(function(err) {
-            res.send('error');
-            console.log(err);
-        });
-
-    // request(options, function(error, response, body) {
-    //     if (!error && response.statusCode == 200) {
-    //         //console.log(response)
-
-    //     } else {
-
-    //     }
-    // })
-}
-
-// pid = 'com.whatsapp'
-// price = 'free'
-
-// console.log(pid)
-// console.log(price)
-// getCategory(getStoreDetailURL(), null)
-
 
 
 const express = require('express')
@@ -231,17 +104,17 @@ app.use('/', express.static(__dirname + '/'));
 app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
 app.post('/data', function(req, res) {
-    pid = req.body.package_name;
-    price = req.body.price;
+    pid = req.body.package_name
+    price = req.body.price
+    category = req.body.category
 
-    console.log(pid)
-    console.log(price)
-    getCategory(getStoreDetailURL(), res)
+    console.log('Package Name : ' + pid)
+    console.log('Price        : ' + price)
+    console.log('Category     : ' + category)
+    getAllCountries(res)
 });
 
 
 var server = app.listen(8080, () => console.log('app listening on port 8080!'))
 server.timeout = 0;
-/*
-Express
-*/
+

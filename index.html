@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <div class="continer col-6 ml-auto mr-auto mt-5" style="margin: 50px;">
+    <div class="continer col-12 ml-auto mr-auto mt-5" style="margin: 50px;">
         <div class="jumbotron">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -31,6 +31,68 @@
                         <option value="paid">Paid</option>
                     </select>
                 </div>
+                <div style="width: 200px;">
+                    <select id="category-select" class="custom-select">
+                        <option value="APPLICATION" selected>APPLICATION</option>
+                        <option value="GAME">GAME</option>
+                        <option value="ART_AND_DESIGN">ART_AND_DESIGN</option>
+                        <option value="AUTO_AND_VEHICLES">AUTO_AND_VEHICLES</option>
+                        <option value="BEAUTY">BEAUTY</option>
+                        <option value="BOOKS_AND_REFERENCE">BOOKS_AND_REFERENCE</option>
+                        <option value="BUSINESS">BUSINESS</option>
+                        <option value="COMICS">COMICS</option>
+                        <option value="COMMUNICATION">COMMUNICATION</option>
+                        <option value="DATING">DATING</option>
+                        <option value="EDUCATION">EDUCATION</option>
+                        <option value="ENTERTAINMENT">ENTERTAINMENT</option>
+                        <option value="EVENTS">EVENTS</option>
+                        <option value="FINANCE">FINANCE</option>
+                        <option value="FOOD_AND_DRINK">FOOD_AND_DRINK</option>
+                        <option value="HEALTH_AND_FITNESS">HEALTH_AND_FITNESS</option>
+                        <option value="HOUSE_AND_HOME">HOUSE_AND_HOME</option>
+                        <option value="LIFESTYLE">LIFESTYLE</option>
+                        <option value="MAPS_AND_NAVIGATION">MAPS_AND_NAVIGATION</option>
+                        <option value="MEDICAL">MEDICAL</option>
+                        <option value="MUSIC_AND_AUDIO">MUSIC_AND_AUDIO</option>
+                        <option value="NEWS_AND_MAGAZINES">NEWS_AND_MAGAZINES</option>
+                        <option value="PARENTING">PARENTING</option>
+                        <option value="PERSONALIZATION">PERSONALIZATION</option>
+                        <option value="PHOTOGRAPHY">PHOTOGRAPHY</option>
+                        <option value="PRODUCTIVITY">PRODUCTIVITY</option>
+                        <option value="SHOPPING">SHOPPING</option>
+                        <option value="SOCIAL">SOCIAL</option>
+                        <option value="SPORTS">SPORTS</option>
+                        <option value="TOOLS">TOOLS</option>
+                        <option value="TRAVEL_AND_LOCAL">TRAVEL_AND_LOCAL</option>
+                        <option value="VIDEO_PLAYERS">VIDEO_PLAYERS</option>
+                        <option value="WEATHER">WEATHER</option>
+                        <option value="LIBRARIES_AND_DEMO">LIBRARIES_AND_DEMO</option>
+                        <option value="GAME_ARCADE">GAME_ARCADE</option>
+                        <option value="GAME_PUZZLE">GAME_PUZZLE</option>
+                        <option value="GAME_CARD">GAME_CARD</option>
+                        <option value="GAME_CASUAL">GAME_CASUAL</option>
+                        <option value="GAME_RACING">GAME_RACING</option>
+                        <option value="GAME_SPORTS">GAME_SPORTS</option>
+                        <option value="GAME_ACTION">GAME_ACTION</option>
+                        <option value="GAME_ADVENTURE">GAME_ADVENTURE</option>
+                        <option value="GAME_BOARD">GAME_BOARD</option>
+                        <option value="GAME_CASINO">GAME_CASINO</option>
+                        <option value="GAME_EDUCATIONAL">GAME_EDUCATIONAL</option>
+                        <option value="GAME_MUSIC">GAME_MUSIC</option>
+                        <option value="GAME_ROLE_PLAYING">GAME_ROLE_PLAYING</option>
+                        <option value="GAME_SIMULATION">GAME_SIMULATION</option>
+                        <option value="GAME_STRATEGY">GAME_STRATEGY</option>
+                        <option value="GAME_TRIVIA">GAME_TRIVIA</option>
+                        <option value="GAME_WORD">GAME_WORD</option>
+                        <option value="FAMILY">FAMILY</option>
+                        <option value="FAMILY_ACTION">FAMILY_ACTION</option>
+                        <option value="FAMILY_BRAINGAMES">FAMILY_BRAINGAMES</option>
+                        <option value="FAMILY_CREATE">FAMILY_CREATE</option>
+                        <option value="FAMILY_EDUCATION">FAMILY_EDUCATION</option>
+                        <option value="FAMILY_MUSICVIDEO">FAMILY_MUSICVIDEO</option>
+                        <option value="FAMILY_PRETEND">FAMILY_PRETEND</option>
+                    </select>
+                </div>
             </div>
         </div>
         <table id="example" class="display" width="100%"></table>
@@ -41,6 +103,7 @@ $("#send_request_button").on('click', function() {
     var button = $(this);
     var package_name = $('#pid').val();
     var price = $('#price-select').val();
+    var category = $('#category-select').val();
 
     console.log(price)
 
@@ -51,16 +114,17 @@ $("#send_request_button").on('click', function() {
             button.html(loadingText);
         }
 
-        sendRequest(button, package_name, price)
+        sendRequest(button, package_name, price, category)
     } else {
         $('.validate').attr('style', "border-radius: 5px; border:#FF0000 1px solid;");
     }
 });
 
-function sendRequest(button, pid, price) {
+function sendRequest(button, pid, price, category) {
     var send_data = {
         'package_name': pid,
-        'price': price
+        'price': price,
+        'category': category
     }
     $.ajax({
         type: "POST",
@@ -92,7 +156,7 @@ function parseData(response_data) {
         one_array.push(one.country_code)
         one_array.push(one.country_name)
         if (isNaN(parseInt(one.rank))) {
-            one_array.push(121)
+            one_array.push(61)
         } else {
             one_array.push(parseInt(one.rank))
         }
